@@ -58,11 +58,12 @@ void setup(){
   pinMode(ledPin, OUTPUT); // sets the digital pin as output
   pinMode(ledPin2, OUTPUT); // sets the digital pin as output
   pinMode(ledPin3, OUTPUT); // sets the digital pin as output
+  //pinMode(38, OUTPUT); // sets the digital pin as output
   pinMode(armswitch_pin, INPUT);
   
   lcd.init();
   lcd.backlight();
-  tone1.begin(9);
+  tone1.begin(38);//on pin 38
   lcd.begin(16, 2);
   Serial.begin(9600);
   
@@ -96,13 +97,22 @@ void setup(){
         armed = true;
         lcd.clear();
         
+        lcd.setCursor(0,0);
+        lcd.print("=====NOTICE=====");
+        lcd.setCursor(0,1);
+        lcd.print("    Arming...   ");
+        delay(5000);
+
+        
         lcd.clear();
         lcd.setCursor(1,0);
         lcd.print("Weapon Status:");
         lcd.setCursor(0,1);
         lcd.print("=====Armed.=====");
         delay(5000);
+        
         lcd.clear();
+
         
         digitalWrite(13, LOW); 
 
@@ -110,8 +120,12 @@ void setup(){
     }
 
   
+  tone1.play(NOTE_B4, 200);
+  delay(300);
+  tone1.play(NOTE_B6, 200);
+  
   lcd.setCursor(0,0);
-  lcd.print("Enter Code: ");
+  lcd.print("Enter Sequence: ");
   while (currentLength < 4)
   {
     lcd.setCursor(currentLength + 6, 1);
@@ -125,7 +139,7 @@ void setup(){
       lcd.print(key);
       password[currentLength] = key;
       currentLength++;
-      tone1.play(NOTE_C6, 200);
+      tone1.play(NOTE_A4, 200);
       }
     }
   }
@@ -136,7 +150,7 @@ void setup(){
     lcd.noCursor();
     lcd.clear();
     lcd.home();
-    lcd.print("You've Entered: ");
+    lcd.print("Defusal Code: ");
     lcd.setCursor(6,1);
     lcd.print(password[0]);
     lcd.print(password[1]);
@@ -365,7 +379,7 @@ void timer()
   
       if(currentMillis - secMillis > interval) 
         {
-          tone1.play(NOTE_G5, 200);
+          tone1.play(NOTE_A4, 200);
           secMillis = currentMillis;
           Scount --; // add 1 to Scount
           digitalWrite(ledPin2, HIGH); // sets the LED on

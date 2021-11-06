@@ -12,10 +12,11 @@
 #include <Tone.h>
 #define pound 14
 
-Tone tone1;
+Tone tone1;//speakers
+Tone tone2;//buzzer
 
-int Scount = 12; // count seconds
-int Mcount = 10; // count minutes
+int Scount = 0; // count seconds
+int Mcount = 5; // count minutes
 int Hcount = 0; // count hours
 int DefuseTimer = 0; // set timer to 0
 int Mpenalty = 5; //59 for 1 attempt boom, less for more
@@ -35,7 +36,8 @@ char entered[4];
 int ledPin = 4; //red led
 int ledPin2 = 3; //yellow led
 int ledPin3 = 2; //green led
-int armswitch_pin = 39;
+int armswitch_pin = 42;
+int keyswitch_pin = 44;
 
 LiquidCrystal_I2C lcd(0x27, 16, 2); // the pins we use on the LCD
 
@@ -60,10 +62,13 @@ void setup(){
   pinMode(ledPin3, OUTPUT); // sets the digital pin as output
   //pinMode(38, OUTPUT); // sets the digital pin as output
   pinMode(armswitch_pin, INPUT);
+  pinMode(keyswitch_pin, INPUT);
+
   
   lcd.init();
   lcd.backlight();
   tone1.begin(38);//on pin 38
+  tone2.begin(40);
   lcd.begin(16, 2);
   Serial.begin(9600);
   
@@ -80,6 +85,16 @@ void setup(){
   lcd.setCursor(4,1);
   lcd.print("Division");
   delay(3000);
+
+  lcd.clear();
+  lcd.setCursor(2,0);
+  lcd.print("Confirm: Point");
+  lcd.setCursor(0,1);
+  lcd.print("of No Return");
+  delay(3000);
+  
+  while(digitalRead(44) == HIGH)
+    Serial.println("MASTER OFF");
 
   lcd.clear();
   lcd.setCursor(1,0);
@@ -100,16 +115,26 @@ void setup(){
         lcd.setCursor(0,0);
         lcd.print("=====NOTICE=====");
         lcd.setCursor(0,1);
+        lcd.print("    Arming      ");
+        delay(500);
+        lcd.setCursor(0,1);
+        lcd.print("    Arming.     ");
+        delay(500);
+        lcd.setCursor(0,1);
+        lcd.print("    Arming..    ");
+        delay(500);
+        lcd.setCursor(0,1);
         lcd.print("    Arming...   ");
-        delay(5000);
+        delay(500);
+        
 
         
         lcd.clear();
         lcd.setCursor(1,0);
         lcd.print("Weapon Status:");
         lcd.setCursor(0,1);
-        lcd.print("=====Armed.=====");
-        delay(5000);
+        lcd.print("=====ARMED======");
+        delay(3000);
         
         lcd.clear();
 
@@ -219,7 +244,7 @@ void loop()
               lcd.print("The bomb has");
               lcd.setCursor (0,1);
               lcd.print("been defused.");
-              
+
               currentLength = 0;
               digitalWrite(ledPin3, HIGH);
               delay(2500);
@@ -272,9 +297,9 @@ void timer()
       lcd.noCursor();
       lcd.clear();
       lcd.home();
-      lcd.print("Point of");
+      lcd.print("Goodbye.");
       lcd.setCursor (0,1);
-      lcd.print("No Return");
+      lcd.print("--------");
 
       delay(1000);
 
@@ -380,6 +405,8 @@ void timer()
       if(currentMillis - secMillis > interval) 
         {
           tone1.play(NOTE_A4, 200);
+          tone2.play(NOTE_A4, 300);
+          
           secMillis = currentMillis;
           Scount --; // add 1 to Scount
           digitalWrite(ledPin2, HIGH); // sets the LED on
